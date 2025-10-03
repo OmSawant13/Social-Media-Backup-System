@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Concepts Demo - Social Media Backup</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        
+        .demo-section {
+            background: white;
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .demo-section h2 {
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        
+        .algorithm-step {
+            background: #e3f2fd;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        
+        .output {
+            background: #f0f0f0;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔬 Data Structures & Algorithms Demo</h1>
+    <p>Interactive demonstration of DSA concepts used in the Social Media Backup System</p>
+
+    <!-- Hash Demo -->
+    <div class="demo-section">
+        <h2>🔐 SHA-256 Hashing for Deduplication</h2>
+        <p>Demonstrates how file chunks are hashed to detect duplicates:</p>
+        <div class="code-block">
+            // Compute SHA-256 hash for file chunk const hash = await hashManager.computeSHA256(chunkData); console.log('Chunk hash:', hash);
+        </div>
+        <input type="file" id="hash-file" accept="*/*">
+        <button class="btn" onclick="demoHashing()">Compute Hash</button>
+        <div id="hash-output" class="output"></div>
+    </div>
+
+    <!-- Queue Demo -->
+    <div class="demo-section">
+        <h2>📋 Queue for Backup Job Management</h2>
+        <p>Demonstrates FIFO (First In, First Out) processing of backup jobs:</p>
+        <div class="code-block">
+            // Add jobs to queue backupQueue.enqueue({file: 'photo1.jpg', status: 'pending'}); backupQueue.enqueue({file: 'video1.mp4', status: 'pending'}); // Process jobs in order while (!backupQueue.isEmpty()) { const job = backupQueue.dequeue(); console.log('Processing:',
+            job.file); }
+        </div>
+        <button class="btn" onclick="demoQueue()">Demo Queue Operations</button>
+        <div id="queue-output" class="output"></div>
+    </div>
+
+    <!-- Stack Demo -->
+    <div class="demo-section">
+        <h2>📚 Stack for File Reconstruction</h2>
+        <p>Demonstrates LIFO (Last In, First Out) file reconstruction:</p>
+        <div class="code-block">
+            // Push file chunks onto stack restoreStack.push(chunk1); restoreStack.push(chunk2); restoreStack.push(chunk3); // Pop chunks in reverse order for reconstruction while (!restoreStack.isEmpty()) { const chunk = restoreStack.pop(); console.log('Reconstructing
+            with chunk:', chunk); }
+        </div>
+        <button class="btn" onclick="demoStack()">Demo Stack Operations</button>
+        <div id="stack-output" class="output"></div>
+    </div>
+
+    <!-- Merkle Tree Demo -->
+    <div class="demo-section">
+        <h2>🌳 Merkle Tree for Integrity Verification</h2>
+        <p>Demonstrates how file integrity is verified using Merkle Tree:</p>
+        <div class="code-block">
+            // Create Merkle Tree from chunk hashes const hashes = ['hash1', 'hash2', 'hash3', 'hash4']; const merkleTree = new MerkleTree(hashes); const rootHash = merkleTree.getRootHash(); // Verify integrity const isValid = merkleTree.verifyIntegrity(rootHash);
+        </div>
+        <button class="btn" onclick="demoMerkleTree()">Demo Merkle Tree</button>
+        <div id="merkle-output" class="output"></div>
+    </div>
+
+    <!-- File Chunking Demo -->
+    <div class="demo-section">
+        <h2>📦 File Chunking Algorithm</h2>
+        <p>Demonstrates how large files are split into 512KB chunks:</p>
+        <div class="code-block">
+            // Split file into chunks const chunks = await fileChunker.chunkFile(file); console.log('File split into ' + chunks.length + ' chunks'); // Each chunk has metadata chunks.forEach((chunk, index) => { console.log('Chunk ' + index + ': ' + chunk.size + '
+            bytes'); });
+        </div>
+        <input type="file" id="chunk-file" accept="*/*">
+        <button class="btn" onclick="demoChunking()">Demo File Chunking</button>
+        <div id="chunk-output" class="output"></div>
+    </div>
+
+    <!-- Bloom Filter Demo -->
+    <div class="demo-section">
+        <h2>🔍 Bloom Filter for Fast Lookup</h2>
+        <p>Demonstrates fast existence checking for chunks:</p>
+        <div class="code-block">
+            // Add items to Bloom Filter bloomFilter.add('chunk_hash_1'); bloomFilter.add('chunk_hash_2'); // Check if item might exist if (bloomFilter.mightContain('chunk_hash_1')) { console.log('Chunk might exist, check storage'); }
+        </div>
+        <button class="btn" onclick="demoBloomFilter()">Demo Bloom Filter</button>
+        <div id="bloom-output" class="output"></div>
+    </div>
+
+    <script src="dsa-utils.js"></script>
+    <script>
+        // Demo functions
+        async function demoHashing() {
+            const fileInput = document.getElementById('hash-file');
+            const output = document.getElementById('hash-output');
+
+            if (!fileInput.files[0]) {
+                output.textContent = 'Please select a file first';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const hashManager = new HashManager();
+
+            // Read file as ArrayBuffer
+            const arrayBuffer = await file.arrayBuffer();
+            const hash = await hashManager.computeSHA256(arrayBuffer);
+
+            output.innerHTML = `
+                <strong>File:</strong> ${file.name}<br>
+                <strong>Size:</strong> ${file.size} bytes<br>
+                <strong>SHA-256 Hash:</strong> ${hash}<br>
+                <strong>Hash Length:</strong> ${hash.length} characters
+            `;
+        }
+
+        function demoQueue() {
+            const output = document.getElementById('queue-output');
+            const queue = new Queue();
+
+            // Add some backup jobs
+            queue.enqueue({
+                file: 'photo1.jpg',
+                status: 'pending'
+            });
+            queue.enqueue({
+                file: 'video1.mp4',
+                status: 'pending'
+            });
+            queue.enqueue({
+                file: 'photo2.jpg',
+                status: 'pending'
+            });
+
+            let result = 'Queue Operations Demo:\n\n';
+            result += `Initial queue size: ${queue.size()}\n\n`;
+
+            result += 'Processing jobs in FIFO order:\n';
+            while (!queue.isEmpty()) {
+                const job = queue.dequeue();
+                result += `- Processing: ${job.file} (Status: ${job.status})\n`;
+            }
+
+            result += `\nFinal queue size: ${queue.size()}`;
+            output.textContent = result;
+        }
+
+        function demoStack() {
+            const output = document.getElementById('stack-output');
+            const stack = new Stack();
+
+            // Push file chunks
+            stack.push({
+                chunk: 'chunk1',
+                data: 'header_data'
+            });
+            stack.push({
+                chunk: 'chunk2',
+                data: 'middle_data'
+            });
+            stack.push({
+                chunk: 'chunk3',
+                data: 'footer_data'
+            });
+
+            let result = 'Stack Operations Demo:\n\n';
+            result += `Initial stack size: ${stack.size()}\n\n`;
+
+            result += 'Reconstructing file in LIFO order:\n';
+            while (!stack.isEmpty()) {
+                const chunk = stack.pop();
+                result += `- Reconstructing with: ${chunk.chunk} (${chunk.data})\n`;
+            }
+
+            result += `\nFinal stack size: ${stack.size()}`;
+            output.textContent = result;
+        }
+
+        function demoMerkleTree() {
+            const output = document.getElementById('merkle-output');
+
+            // Create sample chunk hashes
+            const hashes = [
+                'a1b2c3d4e5f6',
+                'f6e5d4c3b2a1',
+                '123456789abc',
+                'cba987654321'
+            ];
+
+            const merkleTree = new MerkleTree(hashes);
+            const rootHash = merkleTree.getRootHash();
+
+            let result = 'Merkle Tree Demo:\n\n';
+            result += 'Leaf hashes:\n';
+            hashes.forEach((hash, index) => {
+                result += `  ${index + 1}. ${hash}\n`;
+            });
+
+            result += `\nRoot hash: ${rootHash}\n`;
+            result += `Tree levels: ${merkleTree.tree.length}\n`;
+            result += `Integrity check: ${merkleTree.verifyIntegrity(rootHash) ? 'PASSED' : 'FAILED'}`;
+
+            output.textContent = result;
+        }
+
+        async function demoChunking() {
+            const fileInput = document.getElementById('chunk-file');
+            const output = document.getElementById('chunk-output');
+
+            if (!fileInput.files[0]) {
+                output.textContent = 'Please select a file first';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const chunker = new FileChunker(1024 * 1024); // 1MB chunks for demo
+
+            const chunks = await chunker.chunkFile(file);
+
+            let result = `File Chunking Demo:\n\n`;
+            result += `File: ${file.name}\n`;
+            result += `Size: ${file.size} bytes\n`;
+            result += `Chunk size: 1MB\n`;
+            result += `Total chunks: ${chunks.length}\n\n`;
+
+            result += 'Chunk details:\n';
+            chunks.forEach((chunk, index) => {
+                result += `  Chunk ${index + 1}: ${chunk.size} bytes\n`;
+            });
+
+            output.textContent = result;
+        }
+
+        function demoBloomFilter() {
+            const output = document.getElementById('bloom-output');
+            const bloomFilter = new BloomFilter(100, 3);
+
+            // Add some chunk hashes
+            const hashes = ['hash1', 'hash2', 'hash3', 'hash4'];
+            hashes.forEach(hash => bloomFilter.add(hash));
+
+            let result = 'Bloom Filter Demo:\n\n';
+            result += 'Added hashes to filter:\n';
+            hashes.forEach(hash => {
+                result += `  - ${hash}\n`;
+            });
+
+            result += '\nChecking existence:\n';
+            hashes.forEach(hash => {
+                const exists = bloomFilter.mightContain(hash);
+                result += `  - ${hash}: ${exists ? 'MIGHT EXIST' : 'NOT FOUND'}\n`;
+            });
+
+            // Test non-existent hash
+            const nonExistent = bloomFilter.mightContain('nonexistent_hash');
+            result += `  - nonexistent_hash: ${nonExistent ? 'MIGHT EXIST' : 'NOT FOUND'}\n`;
+
+            result += '\nNote: Bloom Filter may have false positives but no false negatives';
+
+            output.textContent = result;
+        }
+    </script>
+</body>
+
+</html>

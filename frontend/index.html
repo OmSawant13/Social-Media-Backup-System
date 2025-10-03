@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Backup & Restore System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="app">
+        <!-- Authentication Screen -->
+        <div id="auth-screen" class="screen">
+            <div class="auth-container">
+                <div class="auth-header">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h1>Social Media Backup</h1>
+                    <p>Secure your memories with our advanced backup system</p>
+                </div>
+
+                <div class="auth-form">
+                    <div id="login-form">
+                        <h2>Welcome Back</h2>
+                        <input type="email" id="email" placeholder="Enter your email" required>
+                        <input type="password" id="password" placeholder="Enter your password" required>
+                        <button id="login-btn" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Sign In
+                        </button>
+                        <button id="signup-toggle" class="btn btn-link">Don't have an account? Sign Up</button>
+                    </div>
+
+                    <div id="signup-form" class="hidden">
+                        <h2>Create Account</h2>
+                        <input type="text" id="signup-name" placeholder="Full Name" required>
+                        <input type="email" id="signup-email" placeholder="Email Address" required>
+                        <input type="password" id="signup-password" placeholder="Create Password" required>
+                        <button id="signup-btn" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Create Account
+                        </button>
+                        <button id="login-toggle" class="btn btn-link">Already have an account? Sign In</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Application Screen -->
+        <div id="main-screen" class="screen hidden">
+            <header class="app-header">
+                <div class="header-content">
+                    <h1><i class="fas fa-cloud-upload-alt"></i> MemoryVault</h1>
+                    <div class="header-actions">
+                        <a href="landing.html" class="back-to-landing" id="back-to-landing" style="display: none;">
+                            <i class="fas fa-home"></i> Back to Home
+                        </a>
+                        <div class="user-info">
+                            <div class="storage-widget">
+                                <div class="storage-icon">
+                                    <i class="fas fa-hdd"></i>
+                                </div>
+                                <div class="storage-details">
+                                    <div class="storage-usage">
+                                        <span class="storage-current" id="storage-used">0 MB</span>
+                                        <span class="storage-separator">/</span>
+                                        <span class="storage-limit">5 GB</span>
+                                    </div>
+                                    <div class="storage-bar-container">
+                                        <div class="storage-bar">
+                                            <div class="storage-progress" id="storage-progress"></div>
+                                        </div>
+                                        <div class="storage-percentage" id="storage-percentage">0%</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="user-details">
+                                <span class="user-email" id="user-email"></span>
+                                <button id="logout-btn" class="btn btn-secondary">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="app-main">
+                <nav class="nav-tabs">
+                    <button class="nav-tab active" data-tab="upload">
+                        <i class="fas fa-upload"></i> Upload Posts
+                    </button>
+                    <button class="nav-tab" data-tab="history">
+                        <i class="fas fa-history"></i> Backup History
+                    </button>
+                    <button class="nav-tab" data-tab="restore">
+                        <i class="fas fa-download"></i> Restore Data
+                    </button>
+                    <button class="nav-tab" data-tab="analytics">
+                        <i class="fas fa-chart-bar"></i> Analytics
+                    </button>
+                </nav>
+
+                <!-- Upload Tab -->
+                <div id="upload-tab" class="tab-content active">
+                    <div class="upload-container">
+                        <div class="upload-area" id="upload-area">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Upload Your Social Media Posts</h3>
+                            <p>Drag and drop files here or click to browse</p>
+                            <p class="upload-hint">Supports: Images, Videos, Documents (Max 100MB per file)</p>
+                            <input type="file" id="file-input" multiple accept="image/*,video/*,.txt,.pdf,.doc,.docx" style="display: none;">
+                        </div>
+
+                        <div class="upload-form">
+                            <input type="text" id="post-caption" placeholder="Add a caption for your post...">
+
+                            <!-- Memory Mood Feature -->
+                            <div class="mood-section">
+                                <h4>🎭 How are you feeling about this memory?</h4>
+                                <div class="mood-buttons">
+                                    <button class="mood-btn" data-mood="happy">
+                                        <span class="mood-emoji">😊</span>
+                                        <span class="mood-text">Happy</span>
+                                    </button>
+                                    <button class="mood-btn" data-mood="excited">
+                                        <span class="mood-emoji">🎉</span>
+                                        <span class="mood-text">Excited</span>
+                                    </button>
+                                    <button class="mood-btn" data-mood="nostalgic">
+                                        <span class="mood-emoji">💭</span>
+                                        <span class="mood-text">Nostalgic</span>
+                                    </button>
+                                    <button class="mood-btn" data-mood="calm">
+                                        <span class="mood-emoji">😌</span>
+                                        <span class="mood-text">Calm</span>
+                                    </button>
+                                    <button class="mood-btn" data-mood="proud">
+                                        <span class="mood-emoji">🏆</span>
+                                        <span class="mood-text">Proud</span>
+                                    </button>
+                                    <button class="mood-btn" data-mood="grateful">
+                                        <span class="mood-emoji">🙏</span>
+                                        <span class="mood-text">Grateful</span>
+                                    </button>
+                                </div>
+                                <div class="mood-selected" id="mood-selected" style="display: none;">
+                                    <span class="selected-mood-text">Selected: <span id="selected-mood"></span></span>
+                                    <button class="mood-clear" id="mood-clear">✕</button>
+                                </div>
+                            </div>
+
+                            <button id="upload-btn" class="btn btn-primary" disabled>
+                                <i class="fas fa-upload"></i> Upload Post
+                            </button>
+                        </div>
+
+                        <div id="upload-progress" class="progress-container hidden">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill"></div>
+                            </div>
+                            <span id="progress-text">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Tab -->
+                <div id="history-tab" class="tab-content">
+                    <div class="history-container">
+                        <div class="history-header">
+                            <h2>Backup History</h2>
+                            <div class="history-stats">
+                                <div class="stat-item">
+                                    <i class="fas fa-file"></i>
+                                    <span id="total-files">0</span>
+                                    <small>Files</small>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-hdd"></i>
+                                    <span id="total-size">0 MB</span>
+                                    <small>Storage</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="backup-list" class="backup-list">
+                            <!-- Backup items will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Restore Tab -->
+                <div id="restore-tab" class="tab-content">
+                    <div class="restore-container">
+                        <div class="restore-header">
+                            <h2>Restore Your Data</h2>
+                            <p>View, preview, and download your backed-up posts</p>
+                        </div>
+
+                        <!-- Image Gallery -->
+                        <div class="restore-gallery" id="restore-gallery">
+                            <!-- Images will be populated here -->
+                        </div>
+
+                        <!-- Restore Options -->
+                        <div class="restore-options">
+                            <button id="select-all-btn" class="btn btn-secondary">
+                                <i class="fas fa-check-double"></i> Select All
+                            </button>
+                            <button id="deselect-all-btn" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Deselect All
+                            </button>
+                            <button id="download-selected-btn" class="btn btn-primary" disabled>
+                                <i class="fas fa-download"></i> Download Selected (<span id="selected-count">0</span>)
+                            </button>
+                            <button id="download-all-zip-btn" class="btn btn-success">
+                                <i class="fas fa-file-archive"></i> Download All as ZIP
+                            </button>
+                        </div>
+
+                        <div id="restore-progress" class="progress-container hidden">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="restore-progress-fill"></div>
+                            </div>
+                            <span id="restore-progress-text">Preparing download...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Tab -->
+                <div id="analytics-tab" class="tab-content">
+                    <div class="analytics-container">
+                        <h2>📊 Backup Analytics</h2>
+
+                        <!-- Key Metrics -->
+                        <div class="analytics-grid">
+                            <div class="analytics-card">
+                                <i class="fas fa-chart-line"></i>
+                                <h3>Total Backups</h3>
+                                <div class="metric-value" id="total-backups">0</div>
+                                <p>Files backed up</p>
+                            </div>
+                            <div class="analytics-card">
+                                <i class="fas fa-hdd"></i>
+                                <h3>Storage Used</h3>
+                                <div class="metric-value" id="total-size">0 MB</div>
+                                <p>Total data stored</p>
+                            </div>
+                            <div class="analytics-card">
+                                <i class="fas fa-calendar"></i>
+                                <h3>Last Backup</h3>
+                                <div class="metric-value" id="last-backup">Never</div>
+                                <p>Most recent upload</p>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity with Sliding Window -->
+                        <div class="analytics-section">
+                            <h3><i class="fas fa-clock"></i> Recent Activity (Last 7 Days)</h3>
+                            <div class="activity-chart" id="activity-chart">
+                                <div class="no-data">No recent activity</div>
+                            </div>
+                        </div>
+
+                        <!-- File Type Distribution -->
+                        <div class="analytics-section">
+                            <h3><i class="fas fa-folder"></i> File Type Distribution</h3>
+                            <div class="file-type-chart" id="file-type-chart">
+                                <div class="no-data">No file data available</div>
+                            </div>
+                        </div>
+
+                        <!-- Emotional Analysis -->
+                        <div class="analytics-section">
+                            <h3><i class="fas fa-heart"></i> Emotional Analysis</h3>
+                            <div class="emotion-chart" id="emotion-chart">
+                                <div class="no-data">No emotional data available</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Firebase SDK - Auth Only -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <!-- MongoDB will be handled via API calls to a backend server -->
+
+    <!-- DSA Utilities -->
+    <script src="dsa-utils.js"></script>
+
+    <script>
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAbMhL5bnIIVB-_MkIF1ZSrtdxKx0MyJok",
+            authDomain: "rdsem-a00a4.firebaseapp.com",
+            projectId: "rdsem-a00a4",
+            storageBucket: "rdsem-a00a4.firebasestorage.app",
+            messagingSenderId: "272667034179",
+            appId: "1:272667034179:web:3067641ac46d88c96d8af6",
+            measurementId: "G-GN5VC6VJKF"
+        };
+
+        // Initialize Firebase (Auth Only)
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // MongoDB API endpoints (we'll create a simple backend)
+        const API_BASE = 'http://localhost:3000/api';
+
+        // MongoDB operations via API calls
+        async function saveToMongoDB(data) {
+            try {
+                const response = await fetch(`${API_BASE}/backup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                return await response.json();
+            } catch (error) {
+                console.error('MongoDB save error:', error);
+                throw error;
+            }
+        }
+
+        async function getFromMongoDB(query) {
+            try {
+                const response = await fetch(`${API_BASE}/backup?${new URLSearchParams(query)}`);
+                return await response.json();
+            } catch (error) {
+                console.error('MongoDB fetch error:', error);
+                throw error;
+            }
+        }
+
+        console.log('Firebase initialized successfully!');
+
+        // Auth state listener
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-screen').classList.remove('hidden');
+                document.getElementById('user-email').textContent = user.email;
+                loadBackupHistory();
+                updateAnalytics();
+                updateStorageDisplay();
+            } else {
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('main-screen').classList.add('hidden');
+            }
+        });
+
+        // Toggle auth forms
+        document.getElementById('signup-toggle').addEventListener('click', () => {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('signup-form').classList.remove('hidden');
+        });
+
+        document.getElementById('login-toggle').addEventListener('click', () => {
+            document.getElementById('signup-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+        });
+
+        // Login
+        document.getElementById('login-btn').addEventListener('click', async() => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                showMessage('Login successful!', 'success');
+            } catch (error) {
+                showMessage(`Login failed: ${error.message}`, 'error');
+            }
+        });
+
+        // Signup
+        document.getElementById('signup-btn').addEventListener('click', async() => {
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+
+                // Save user data to MongoDB
+                await saveToMongoDB({
+                    type: 'user',
+                    uid: userCredential.user.uid,
+                    name: name,
+                    email: email,
+                    createdAt: new Date()
+                });
+
+                showMessage('Account created successfully!', 'success');
+            } catch (error) {
+                showMessage(`Signup failed: ${error.message}`, 'error');
+            }
+        });
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            auth.signOut();
+        });
+
+        // File upload
+        document.getElementById('file-input').addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                document.getElementById('upload-btn').disabled = false;
+                showFilePreviews(e.target.files);
+            }
+        });
+
+        // Make upload area clickable
+        document.getElementById('upload-area').addEventListener('click', () => {
+            document.getElementById('file-input').click();
+        });
+
+        document.getElementById('upload-btn').addEventListener('click', async() => {
+            const fileInput = document.getElementById('file-input');
+            const caption = document.getElementById('post-caption').value;
+
+            console.log('Upload button clicked!');
+            console.log('File input files:', fileInput.files);
+            console.log('Caption:', caption);
+
+            if (!fileInput.files[0]) {
+                showMessage('Please select a file', 'error');
+                return;
+            }
+
+            if (!caption.trim()) {
+                showMessage('Please add a caption', 'error');
+                return;
+            }
+
+            try {
+                const file = fileInput.files[0];
+                const user = auth.currentUser;
+
+                console.log('File to upload:', file);
+                console.log('User:', user);
+
+                if (!user) {
+                    showMessage('Please login first', 'error');
+                    return;
+                }
+
+                // Show progress
+                document.getElementById('upload-progress').classList.remove('hidden');
+                updateProgress(0);
+
+                // Upload file to professional GridFS storage
+                console.log('Uploading file to GridFS...');
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('userId', user.uid);
+                formData.append('caption', caption);
+
+                try {
+                    const response = await fetch(`${API_BASE}/backup`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+                    console.log('Professional upload result:', result);
+
+                    if (result.success) {
+                        showMessage('File uploaded successfully!', 'success');
+                        // Don't load backup history after upload - only after download
+                        updateAnalytics();
+                        updateStorageDisplay();
+
+                        // Reset form completely
+                        document.getElementById('file-input').value = '';
+                        document.getElementById('post-caption').value = '';
+                        document.getElementById('upload-btn').disabled = true;
+                        document.getElementById('upload-progress').classList.add('hidden');
+
+                        // Clear file previews
+                        const uploadArea = document.getElementById('upload-area');
+                        const existingPreviews = uploadArea.querySelectorAll('.file-preview');
+                        existingPreviews.forEach(preview => preview.remove());
+
+                        // Reset upload area text
+                        const uploadText = uploadArea.querySelector('h3');
+                        if (uploadText) {
+                            uploadText.textContent = 'Upload Your Social Media Posts';
+                        }
+                    } else {
+                        throw new Error(result.error || 'Upload failed');
+                    }
+
+                } catch (error) {
+                    console.error('Professional upload error:', error);
+                    showMessage(`Upload failed: ${error.message}`, 'error');
+                    document.getElementById('upload-progress').classList.add('hidden');
+                }
+
+                showMessage('File uploaded successfully!', 'success');
+                // Don't load backup history after upload - only after download
+                updateAnalytics();
+                updateStorageDisplay();
+
+                // Reset form
+                document.getElementById('file-input').value = '';
+                document.getElementById('post-caption').value = '';
+                document.getElementById('upload-btn').disabled = true;
+                document.getElementById('upload-progress').classList.add('hidden');
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                showMessage(`Upload failed: ${error.message}`, 'error');
+                document.getElementById('upload-progress').classList.add('hidden');
+            }
+        });
+
+        // Load backup history
+        async function loadBackupHistory() {
+            try {
+                const user = auth.currentUser;
+                if (!user) return;
+
+                // Query MongoDB for user's backups via API
+                const response = await fetch(`http://localhost:3000/api/backup?userId=${user.uid}`);
+                const allBackups = await response.json();
+                const backups = allBackups.filter(backup => backup.userId === user.uid);
+
+                const backupList = document.getElementById('backup-list');
+                backupList.innerHTML = '';
+
+                if (backups.length === 0) {
+                    backupList.innerHTML = '<p>No backups found. Upload some files to get started!</p>';
+                    return;
+                }
+
+                let totalSize = 0;
+                backups.forEach((backup) => {
+                    totalSize += backup.fileSize;
+
+                    const backupItem = document.createElement('div');
+                    backupItem.className = 'backup-item';
+                    backupItem.innerHTML = `
+                        <div class="backup-info">
+                            <h3>${backup.fileName}</h3>
+                            <p>${formatFileSize(backup.fileSize)} • ${formatDate(backup.uploadedAt)}</p>
+                            <p><strong>Caption:</strong> ${backup.caption}</p>
+                        </div>
+                        <div class="backup-actions">
+                            <button class="btn btn-small btn-secondary" onclick="downloadFileFromMongo('${backup._id}', '${backup.fileName}')">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        </div>
+                    `;
+                    backupList.appendChild(backupItem);
+                });
+
+                // Update stats
+                document.getElementById('total-files').textContent = backups.length;
+                document.getElementById('total-size').textContent = formatFileSize(totalSize);
+            } catch (error) {
+                console.error('Error loading backup history:', error);
+            }
+        }
+
+        // Test API connection
+        async function testAPI() {
+            try {
+                console.log('🧪 Testing API connection...');
+                const response = await fetch('http://localhost:3000/api/health');
+                const data = await response.json();
+                console.log('✅ API Health:', data);
+                return true;
+            } catch (error) {
+                console.error('❌ API Test Failed:', error);
+                return false;
+            }
+        }
+
+        // Update analytics with real data using Sliding Window algorithm
+        async function updateAnalytics() {
+            try {
+                console.log('🔄 Fetching analytics data...');
+                // Test API first
+                const apiWorking = await testAPI();
+                if (!apiWorking) {
+                    throw new Error('API not accessible');
+                }
+
+                // Fetch real backup data
+                const response = await fetch(`http://localhost:3000/api/backup?userId=${user.uid}`);
+                const data = await response.json();
+                console.log('📊 Raw API data:', data);
+
+                if (Array.isArray(data) && data.length >= 0) {
+                    const backups = data;
+                    console.log('✅ Processing', backups.length, 'backups');
+
+                    // Calculate real analytics
+                    const totalBackups = backups.length;
+                    const totalSize = backups.reduce((sum, backup) => sum + (backup.fileSize || 0), 0);
+                    const lastBackup = backups.length > 0 ?
+                        new Date(backups[0].uploadedAt).toLocaleDateString() : 'Never';
+
+                    // Update basic metrics
+                    document.getElementById('total-backups').textContent = totalBackups;
+                    document.getElementById('total-size').textContent = formatFileSize(totalSize);
+                    document.getElementById('last-backup').textContent = lastBackup;
+
+                    // Sliding Window Algorithm for Recent Activity (Last 7 days)
+                    updateRecentActivity(backups);
+
+                    // File Type Distribution
+                    updateFileTypeDistribution(backups);
+
+                    // Emotional Analysis
+                    updateEmotionalAnalysis(backups);
+
+                    console.log('📊 Analytics updated with real data:', {
+                        totalBackups,
+                        totalSize: formatFileSize(totalSize),
+                        lastBackup
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Error updating analytics:', error);
+                console.log('🔄 Falling back to mock data...');
+                // Fallback to mock data
+                updateAnalyticsWithMockData();
+            }
+        }
+
+        // Sliding Window Algorithm for Recent Activity
+        function updateRecentActivity(backups) {
+            const now = new Date();
+            const sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+
+            // Sliding window: track activity for each day
+            const dailyActivity = {};
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000));
+                const dateKey = date.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                dailyActivity[dateKey] = 0;
+            }
+
+            // Count backups in sliding window
+            backups.forEach(backup => {
+                const backupDate = new Date(backup.uploadedAt);
+                if (backupDate >= sevenDaysAgo) {
+                    const dateKey = backupDate.toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                    if (dailyActivity.hasOwnProperty(dateKey)) {
+                        dailyActivity[dateKey]++;
+                    }
+                }
+            });
+
+            // Display activity chart
+            const activityChart = document.getElementById('activity-chart');
+            const maxActivity = Math.max(...Object.values(dailyActivity));
+
+            if (maxActivity === 0) {
+                activityChart.innerHTML = '<div class="no-data">No recent activity</div>';
+                return;
+            }
+
+            activityChart.innerHTML = Object.entries(dailyActivity)
+                .sort(([a], [b]) => new Date(a) - new Date(b))
+                .map(([date, count]) => {
+                    const percentage = maxActivity > 0 ? (count / maxActivity) * 100 : 0;
+                    return `
+                        <div class="activity-item">
+                            <div class="activity-header">
+                                <span class="activity-name">${date}</span>
+                                <span class="activity-count">${count} files</span>
+                            </div>
+                            <div class="activity-bar">
+                                <div class="activity-fill" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+        }
+
+        // File Type Distribution
+        function updateFileTypeDistribution(backups) {
+            const fileTypes = {};
+
+            backups.forEach(backup => {
+                const mimeType = backup.mimeType || 'unknown';
+                const category = getFileCategory(mimeType);
+                fileTypes[category] = (fileTypes[category] || 0) + 1;
+            });
+
+            const fileTypeChart = document.getElementById('file-type-chart');
+            const totalFiles = Object.values(fileTypes).reduce((sum, count) => sum + count, 0);
+
+            if (totalFiles === 0) {
+                fileTypeChart.innerHTML = '<div class="no-data">No file data available</div>';
+                return;
+            }
+
+            fileTypeChart.innerHTML = Object.entries(fileTypes)
+                .sort(([, a], [, b]) => b - a)
+                .map(([type, count]) => {
+                    const percentage = ((count / totalFiles) * 100).toFixed(1);
+                    return `
+                        <div class="file-type-item">
+                            <div class="file-type-header">
+                                <span class="file-type-name">${type}</span>
+                                <span class="file-type-count">${count} (${percentage}%)</span>
+                            </div>
+                            <div class="file-type-bar">
+                                <div class="file-type-fill" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+        }
+
+        // Emotional Analysis
+        function updateEmotionalAnalysis(backups) {
+            const emotionCounts = {};
+
+            backups.forEach(backup => {
+                const mood = backup.mood || 'neutral';
+                emotionCounts[mood] = (emotionCounts[mood] || 0) + 1;
+            });
+
+            const emotionChart = document.getElementById('emotion-chart');
+            const totalEmotions = Object.values(emotionCounts).reduce((sum, count) => sum + count, 0);
+
+            if (totalEmotions === 0) {
+                emotionChart.innerHTML = '<div class="no-data">No emotional data available</div>';
+                return;
+            }
+
+            emotionChart.innerHTML = Object.entries(emotionCounts)
+                .sort(([, a], [, b]) => b - a)
+                .map(([emotion, count]) => {
+                    const percentage = ((count / totalEmotions) * 100).toFixed(1);
+                    return `
+                        <div class="emotion-item">
+                            <div class="emotion-header">
+                                <span class="emotion-name">${emotion.charAt(0).toUpperCase() + emotion.slice(1)}</span>
+                                <span class="emotion-count">${count} (${percentage}%)</span>
+                            </div>
+                            <div class="emotion-bar">
+                                <div class="emotion-fill" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+        }
+
+        // Helper function to categorize file types
+        function getFileCategory(mimeType) {
+            if (mimeType.startsWith('image/')) return 'Images';
+            if (mimeType.startsWith('video/')) return 'Videos';
+            if (mimeType.startsWith('audio/')) return 'Audio';
+            if (mimeType.includes('pdf')) return 'Documents';
+            if (mimeType.includes('text/')) return 'Text';
+            return 'Other';
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Fallback mock data
+        function updateAnalyticsWithMockData() {
+            const mockData = {
+                totalBackups: 0,
+                totalSize: '0 MB',
+                lastBackup: 'Never'
+            };
+
+            document.getElementById('total-backups').textContent = mockData.totalBackups;
+            document.getElementById('total-size').textContent = mockData.totalSize;
+            document.getElementById('last-backup').textContent = mockData.lastBackup;
+
+            // Show no data for charts
+            document.getElementById('activity-chart').innerHTML = '<div class="no-data">No recent activity</div>';
+            document.getElementById('file-type-chart').innerHTML = '<div class="no-data">No file data available</div>';
+            document.getElementById('emotion-chart').innerHTML = '<div class="no-data">No emotional data available</div>';
+        }
+
+        // Storage calculation functions - Fetch from MongoDB
+        async function calculateStorageUsage() {
+            try {
+                const response = await fetch(`http://localhost:3000/api/backup?userId=${user.uid}`);
+                const data = await response.json();
+
+                if (Array.isArray(data)) {
+                    let totalSize = 0;
+                    data.forEach(backup => {
+                        if (backup.fileSize) {
+                            totalSize += backup.fileSize;
+                        }
+                    });
+                    return totalSize;
+                }
+                return 0;
+            } catch (error) {
+                console.error('Error calculating storage:', error);
+                return 0;
+            }
+        }
+
+        async function updateStorageDisplay() {
+            try {
+                const totalSize = await calculateStorageUsage();
+                const sizeInMB = (totalSize / (1024 * 1024)).toFixed(2);
+                const sizeInGB = (totalSize / (1024 * 1024 * 1024)).toFixed(2);
+
+                // Free plan: 5GB limit
+                const limitInBytes = 5 * 1024 * 1024 * 1024; // 5GB
+                const percentage = Math.min((totalSize / limitInBytes) * 100, 100);
+
+                // Update storage display
+                document.getElementById('storage-used').textContent =
+                    totalSize > 1024 * 1024 * 1024 ? `${sizeInGB} GB` : `${sizeInMB} MB`;
+                document.getElementById('storage-progress').style.width = `${percentage}%`;
+                document.getElementById('storage-percentage').textContent = `${percentage.toFixed(1)}%`;
+
+                // Change color based on usage
+                const progressBar = document.getElementById('storage-progress');
+                if (percentage > 80) {
+                    progressBar.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                } else if (percentage > 60) {
+                    progressBar.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+                } else {
+                    progressBar.style.background = 'linear-gradient(135deg, #8b5cf6, #7c3aed)';
+                }
+
+                console.log('📊 Storage updated:', {
+                    totalSize: totalSize > 1024 * 1024 * 1024 ? `${sizeInGB} GB` : `${sizeInMB} MB`,
+                    percentage: `${percentage.toFixed(1)}%`
+                });
+            } catch (error) {
+                console.error('❌ Error updating storage display:', error);
+            }
+        }
+
+
+        // Show file previews
+        function showFilePreviews(files) {
+            const uploadArea = document.getElementById('upload-area');
+            const existingPreviews = uploadArea.querySelectorAll('.file-preview');
+            existingPreviews.forEach(preview => preview.remove());
+
+            Array.from(files).forEach((file, index) => {
+                const preview = document.createElement('div');
+                preview.className = 'file-preview';
+                preview.innerHTML = `
+                    <img src="${URL.createObjectURL(file)}" alt="Preview" onerror="this.style.display='none'">
+                    <div class="file-info">
+                        <h4>${file.name}</h4>
+                        <p>${formatFileSize(file.size)} - ${file.type}</p>
+                    </div>
+                    <i class="fas fa-times file-remove" onclick="this.parentElement.remove()"></i>
+                `;
+                uploadArea.appendChild(preview);
+            });
+        }
+
+        // Update progress
+        function updateProgress(percentage) {
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+
+            progressFill.style.width = `${percentage}%`;
+            progressText.textContent = `${Math.round(percentage)}%`;
+        }
+
+        // Tab navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.dataset.tab;
+
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(`${targetTab}-tab`).classList.add('active');
+
+                // Load restore gallery when restore tab is clicked
+                if (targetTab === 'restore') {
+                    loadRestoreGallery();
+                }
+            });
+        });
+
+        // Utility functions
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+
+            // Insert into the current visible screen
+            const authScreen = document.getElementById('auth-screen');
+            const mainScreen = document.getElementById('main-screen');
+
+            if (!authScreen.classList.contains('hidden')) {
+                // User is on auth screen
+                authScreen.appendChild(messageDiv);
+            } else {
+                // User is on main screen
+                const mainContent = document.querySelector('.app-main');
+                mainContent.insertBefore(messageDiv, mainContent.firstChild);
+            }
+
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+
+        function formatDate(timestamp) {
+            if (!timestamp) return 'Unknown';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+
+        // Restore Gallery Functions
+        let selectedFiles = new Set();
+
+        async function loadRestoreGallery() {
+            try {
+                const user = auth.currentUser;
+                if (!user) return;
+
+                const response = await fetch(`http://localhost:3000/api/backup?userId=${user.uid}`);
+                const allBackups = await response.json();
+                const backups = allBackups.filter(backup => backup.userId === user.uid);
+
+                const gallery = document.getElementById('restore-gallery');
+                gallery.innerHTML = '';
+
+                if (backups.length === 0) {
+                    gallery.innerHTML = '<p class="no-files">No files found. Upload some files to get started!</p>';
+                    return;
+                }
+
+                backups.forEach((backup, index) => {
+                    const galleryItem = document.createElement('div');
+                    galleryItem.className = 'gallery-item';
+                    galleryItem.innerHTML = `
+                        <div class="gallery-checkbox">
+                            <input type="checkbox" id="file-${index}" data-file-id="${backup._id}" data-file-url="${backup.fileUrl}">
+                            <label for="file-${index}"></label>
+                        </div>
+                        <div class="gallery-preview" onclick="previewImage('${backup.fileUrl}', '${backup.fileName}')">
+                            <img src="${backup.fileUrl}" alt="${backup.fileName}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+SW1hZ2U8L3RleHQ+PC9zdmc+'">
+                        </div>
+                        <div class="gallery-info">
+                            <h4>${backup.fileName}</h4>
+                            <p>${formatFileSize(backup.fileSize)} • ${formatDate(backup.uploadedAt)}</p>
+                            <p class="caption">${backup.caption}</p>
+                        </div>
+                        <div class="gallery-actions">
+                            <button class="btn btn-small btn-primary" onclick="downloadSingleFile('${backup.fileUrl}', '${backup.fileName}')">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    `;
+                    gallery.appendChild(galleryItem);
+                });
+
+                // Add event listeners for checkboxes
+                addCheckboxListeners();
+
+            } catch (error) {
+                console.error('Error loading restore gallery:', error);
+            }
+        }
+
+        function addCheckboxListeners() {
+            document.querySelectorAll('#restore-gallery input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectedCount);
+            });
+        }
+
+        function updateSelectedCount() {
+            const checkboxes = document.querySelectorAll('#restore-gallery input[type="checkbox"]:checked');
+            const count = checkboxes.length;
+
+            document.getElementById('selected-count').textContent = count;
+            document.getElementById('download-selected-btn').disabled = count === 0;
+        }
+
+        // Restore button event listeners
+        document.getElementById('select-all-btn').addEventListener('click', () => {
+            document.querySelectorAll('#restore-gallery input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            updateSelectedCount();
+        });
+
+        document.getElementById('deselect-all-btn').addEventListener('click', () => {
+            document.querySelectorAll('#restore-gallery input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            updateSelectedCount();
+        });
+
+        document.getElementById('download-selected-btn').addEventListener('click', downloadSelectedFiles);
+        document.getElementById('download-all-zip-btn').addEventListener('click', downloadAllAsZip);
+
+        // Preview image in modal
+        function previewImage(imageUrl, fileName) {
+            const modal = document.createElement('div');
+            modal.className = 'image-modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <img src="${imageUrl}" alt="${fileName}">
+                    <h3>${fileName}</h3>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            modal.querySelector('.close').addEventListener('click', () => {
+                modal.remove();
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        // Add download to backup history
+        function addToBackupHistory(fileName, fileUrl) {
+            const backupList = document.getElementById('backup-list');
+
+            // Create backup history entry
+            const backupItem = document.createElement('div');
+            backupItem.className = 'backup-item';
+            backupItem.innerHTML = `
+                <div class="backup-info">
+                    <h3>📥 ${fileName}</h3>
+                    <p>Downloaded • ${new Date().toLocaleDateString()}</p>
+                    <p><strong>Status:</strong> Restored from backup</p>
+                </div>
+                <div class="backup-actions">
+                    <span class="backup-status restored">✅ Restored</span>
+                </div>
+            `;
+
+            // Add to top of list
+            backupList.insertBefore(backupItem, backupList.firstChild);
+
+            // Update analytics
+            updateAnalytics();
+            updateStorageDisplay();
+
+            console.log('📥 Added to backup history:', fileName);
+        }
+
+        // Download single file
+        function downloadSingleFile(fileUrl, fileName) {
+            // Create a temporary link with download attribute
+            const a = document.createElement('a');
+            a.href = fileUrl;
+            a.download = fileName;
+            a.target = '_blank'; // Open in new tab if download fails
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            // Add to backup history after download
+            addToBackupHistory(fileName, fileUrl);
+        }
+
+        // Download selected files
+        async function downloadSelectedFiles() {
+            const selectedCheckboxes = document.querySelectorAll('#restore-gallery input[type="checkbox"]:checked');
+
+            if (selectedCheckboxes.length === 0) {
+                showMessage('Please select files to download', 'error');
+                return;
+            }
+
+            showMessage(`Downloading ${selectedCheckboxes.length} files...`, 'success');
+
+            selectedCheckboxes.forEach((checkbox, index) => {
+                setTimeout(() => {
+                    const fileUrl = checkbox.dataset.fileUrl;
+                    const fileName = checkbox.closest('.gallery-item').querySelector('h4').textContent;
+                    downloadSingleFile(fileUrl, fileName);
+                }, index * 500); // Stagger downloads
+            });
+        }
+
+        // Download all as ZIP
+        async function downloadAllAsZip() {
+            try {
+                const user = auth.currentUser;
+                if (!user) return;
+
+                const response = await fetch(`http://localhost:3000/api/backup?userId=${user.uid}`);
+                const allBackups = await response.json();
+                const backups = allBackups.filter(backup => backup.userId === user.uid);
+
+                if (backups.length === 0) {
+                    showMessage('No files to download', 'error');
+                    return;
+                }
+
+                showMessage('Preparing ZIP download...', 'success');
+
+                // For now, download files individually
+                // In a real implementation, you'd create a ZIP on the server
+                backups.forEach((backup, index) => {
+                    setTimeout(() => {
+                        downloadSingleFile(backup.fileUrl, backup.fileName);
+                    }, index * 200);
+                });
+
+            } catch (error) {
+                console.error('ZIP download error:', error);
+                showMessage('ZIP download failed', 'error');
+            }
+        }
+
+        // Memory Mood Feature
+        let selectedMood = null;
+
+        function initializeMoodFeature() {
+            // Mood button click handlers
+            document.querySelectorAll('.mood-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const mood = this.getAttribute('data-mood');
+                    selectMood(mood);
+                });
+            });
+
+            // Clear mood handler
+            document.getElementById('mood-clear').addEventListener('click', function() {
+                clearMood();
+            });
+        }
+
+        function selectMood(mood) {
+            // Remove previous selection
+            document.querySelectorAll('.mood-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            // Add selection to clicked button
+            document.querySelector(`[data-mood="${mood}"]`).classList.add('selected');
+
+            // Update selected mood display
+            selectedMood = mood;
+            document.getElementById('selected-mood').textContent = mood.charAt(0).toUpperCase() + mood.slice(1);
+            document.getElementById('mood-selected').style.display = 'flex';
+
+            // Show mood message
+            showMoodMessage(mood);
+        }
+
+        function clearMood() {
+            // Remove all selections
+            document.querySelectorAll('.mood-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            // Hide selected mood display
+            document.getElementById('mood-selected').style.display = 'none';
+            selectedMood = null;
+        }
+
+        function showMoodMessage(mood) {
+            const messages = {
+                happy: "😊 Great! This memory brings you joy!",
+                excited: "🎉 Awesome! You're excited about this memory!",
+                nostalgic: "💭 Beautiful! This memory makes you nostalgic!",
+                calm: "😌 Perfect! This memory brings you peace!",
+                proud: "🏆 Wonderful! You're proud of this memory!",
+                grateful: "🙏 Amazing! This memory fills you with gratitude!"
+            };
+
+            showMessage(messages[mood], 'success');
+        }
+
+        // Update upload function to include mood
+        function uploadFile() {
+            if (!selectedFiles.length) {
+                showMessage('Please select files to upload', 'error');
+                return;
+            }
+
+            if (!user) {
+                showMessage('Please sign in to upload files', 'error');
+                return;
+            }
+
+            document.getElementById('upload-progress').classList.remove('hidden');
+            document.getElementById('upload-btn').disabled = true;
+
+            // Upload each file
+            selectedFiles.forEach(async(file, index) => {
+                try {
+                    const caption = document.getElementById('post-caption').value;
+
+                    // Create FormData with mood
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('userId', user.uid);
+                    formData.append('caption', caption);
+                    formData.append('mood', selectedMood || 'neutral'); // Include mood
+
+                    const response = await fetch(`${API_BASE}/backup`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showMessage(`File ${index + 1} uploaded successfully!`, 'success');
+
+                        // Show mood-specific success message
+                        if (selectedMood) {
+                            setTimeout(() => {
+                                showMoodMessage(selectedMood);
+                            }, 1000);
+                        }
+                    } else {
+                        throw new Error(result.error || 'Upload failed');
+                    }
+
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    showMessage(`Upload failed: ${error.message}`, 'error');
+                }
+            });
+
+            // Reset form
+            setTimeout(() => {
+                document.getElementById('file-input').value = '';
+                document.getElementById('post-caption').value = '';
+                document.getElementById('upload-btn').disabled = true;
+                document.getElementById('upload-progress').classList.add('hidden');
+
+                // Clear mood selection
+                clearMood();
+
+                // Clear file previews
+                const uploadArea = document.getElementById('upload-area');
+                const existingPreviews = uploadArea.querySelectorAll('.file-preview');
+                existingPreviews.forEach(preview => preview.remove());
+
+                selectedFiles = [];
+                loadBackupHistory();
+                updateAnalytics();
+                updateStorageDisplay();
+            }, 2000);
+        }
+    </script>
+</body>
+
+</html>
