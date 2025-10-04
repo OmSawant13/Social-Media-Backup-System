@@ -1,0 +1,31 @@
+{
+    "hosting": {
+        "public": ".",
+        "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**"
+        ],
+        "rewrites": [{
+                "source": "/api/**",
+                "function": "app"
+            },
+            {
+                "source": "/",
+                "destination": "/frontend/landing.html"
+            },
+            {
+                "source": "/app",
+                "destination": "/frontend/index.html"
+            },
+            {
+                "source": "**",
+                "destination": "/frontend/landing.html"
+            }
+        ]
+    },
+    "functions": {
+        "source": "backend",
+        "runtime": "nodejs18"
+    }
+}

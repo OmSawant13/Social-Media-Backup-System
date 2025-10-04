@@ -89,6 +89,27 @@ app.post('/api/backup', upload.single('file'), async(req, res) => {
         const { userId, caption, mood, type } = req.body;
         const file = req.file;
 
+        // Handle download events (no file upload)
+        if (type === 'download') {
+            const { fileName, fileUrl, downloadedAt } = req.body;
+
+            const result = await collection.insertOne({
+                type: 'download',
+                userId: userId,
+                fileName: fileName,
+                fileUrl: fileUrl,
+                downloadedAt: new Date(downloadedAt),
+                caption: caption || `Downloaded: ${fileName}`,
+                mood: mood || 'restored'
+            });
+
+            console.log('📥 Download event saved:', result.insertedId);
+            return res.json({
+                success: true,
+                message: 'Download event saved successfully',
+                id: result.insertedId
+            });
+        }
 
         // Handle file uploads
         if (!file) {
@@ -197,7 +218,7 @@ app.get('/api/files/:fileId', async(req, res) => {
         if (fileInfo.length > 0) {
             const file = fileInfo[0];
             res.setHeader('Content-Disposition', `attachment; filename="${file.filename}"`);
-            res.setHeader('Content-Type', file.metadata ? .mimeType || 'application/octet-stream');
+            res.setHeader('Content-Type', file.metadata?.mimeType || 'application/octet-stream');
         }
 
         downloadStream.pipe(res);

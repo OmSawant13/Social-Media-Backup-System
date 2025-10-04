@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Social Media Backup & Restore System</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="frontend/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -56,29 +56,11 @@
                             <i class="fas fa-home"></i> Back to Home
                         </a>
                         <div class="user-info">
-                            <div class="storage-widget">
-                                <div class="storage-icon">
-                                    <i class="fas fa-hdd"></i>
-                                </div>
-                                <div class="storage-details">
-                                    <div class="storage-usage">
-                                        <span class="storage-current" id="storage-used">0 MB</span>
-                                        <span class="storage-separator">/</span>
-                                        <span class="storage-limit">5 GB</span>
-                                    </div>
-                                    <div class="storage-bar-container">
-                                        <div class="storage-bar">
-                                            <div class="storage-progress" id="storage-progress"></div>
-                                        </div>
-                                        <div class="storage-percentage" id="storage-percentage">0%</div>
-                                    </div>
-                                </div>
-                            </div>
                             <div class="user-details">
                                 <span class="user-email" id="user-email"></span>
                                 <button id="logout-btn" class="btn btn-secondary">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </button>
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
                             </div>
                         </div>
                     </div>
@@ -178,7 +160,7 @@
                                 <div class="stat-item">
                                     <i class="fas fa-hdd"></i>
                                     <span id="total-size">0 MB</span>
-                                    <small>Storage</small>
+                                    <small>Total Storage Used/5GB</small>
                                 </div>
                             </div>
                         </div>
@@ -241,9 +223,9 @@
                             </div>
                             <div class="analytics-card">
                                 <i class="fas fa-hdd"></i>
-                                <h3>Storage Used</h3>
-                                <div class="metric-value" id="total-size">0 MB</div>
-                                <p>Total data stored</p>
+                                <h3>Total Storage Used/5GB</h3>
+                                <div class="metric-value" id="analytics-total-size">0 MB</div>
+                                <p>Total size of files in Restore Gallery</p>
                             </div>
                             <div class="analytics-card">
                                 <i class="fas fa-calendar"></i>
@@ -289,7 +271,7 @@
     <!-- MongoDB will be handled via API calls to a backend server -->
 
     <!-- DSA Utilities -->
-    <script src="dsa-utils.js"></script>
+    <script src="frontend/dsa-utils.js"></script>
 
     <script>
         // Firebase config
@@ -308,6 +290,7 @@
         const auth = firebase.auth();
 
         // MongoDB API endpoints (we'll create a simple backend)
+        // Use localhost for local testing
         const API_BASE = 'http://localhost:3000/api';
 
         // MongoDB operations via API calls
@@ -347,7 +330,6 @@
                 document.getElementById('user-email').textContent = user.email;
                 loadBackupHistory();
                 updateAnalytics();
-                updateStorageDisplay();
             } else {
                 document.getElementById('auth-screen').classList.remove('hidden');
                 document.getElementById('main-screen').classList.add('hidden');
@@ -461,6 +443,7 @@
                 formData.append('file', file);
                 formData.append('userId', user.uid);
                 formData.append('caption', caption);
+                formData.append('mood', selectedMood || 'neutral');
 
                 try {
                     const response = await fetch(`${API_BASE}/backup`, {
@@ -475,7 +458,6 @@
                         showMessage('File uploaded successfully!', 'success');
                         // Don't load backup history after upload - only after download
                         updateAnalytics();
-                        updateStorageDisplay();
 
                         // Reset form completely
                         document.getElementById('file-input').value = '';
@@ -503,17 +485,6 @@
                     document.getElementById('upload-progress').classList.add('hidden');
                 }
 
-                showMessage('File uploaded successfully!', 'success');
-                // Don't load backup history after upload - only after download
-                updateAnalytics();
-                updateStorageDisplay();
-
-                // Reset form
-                document.getElementById('file-input').value = '';
-                document.getElementById('post-caption').value = '';
-                document.getElementById('upload-btn').disabled = true;
-                document.getElementById('upload-progress').classList.add('hidden');
-
             } catch (error) {
                 console.error('Upload error:', error);
                 showMessage(`Upload failed: ${error.message}`, 'error');
@@ -528,7 +499,7 @@
                 if (!user) return;
 
                 // Query MongoDB for user's backups via API
-                const response = await fetch(`http://localhost:3000/api/backup?userId=${user.uid}`);
+                const response = await fetch(`${API_BASE}/backup?userId=${user.uid}`);
                 const allBackups = await response.json();
                 const backups = allBackups.filter(backup => backup.userId === user.uid);
 
@@ -586,41 +557,71 @@
         // Update analytics with real data using Sliding Window algorithm
         async function updateAnalytics() {
             try {
-                console.log('🔄 Fetching analytics data...');
-                // Test API first
-                const apiWorking = await testAPI();
-                if (!apiWorking) {
-                    throw new Error('API not accessible');
+                const user = auth.currentUser;
+                if (!user) {
+                    console.log('❌ No user logged in');
+                    return;
                 }
 
+                console.log('🔄 Fetching analytics data...');
+                console.log('🔗 API_BASE:', API_BASE);
+                console.log('👤 User ID:', user.uid);
+
                 // Fetch real backup data
-                const response = await fetch(`http://localhost:3000/api/backup?userId=${user.uid}`);
+                const response = await fetch(`${API_BASE}/backup?userId=${user.uid}`);
+                console.log('📡 Response status:', response.status);
                 const data = await response.json();
                 console.log('📊 Raw API data:', data);
 
                 if (Array.isArray(data) && data.length >= 0) {
-                    const backups = data;
-                    console.log('✅ Processing', backups.length, 'backups');
+                    const allData = data;
+                    console.log('✅ Processing', allData.length, 'total records');
 
-                    // Calculate real analytics
-                    const totalBackups = backups.length;
-                    const totalSize = backups.reduce((sum, backup) => sum + (backup.fileSize || 0), 0);
-                    const lastBackup = backups.length > 0 ?
-                        new Date(backups[0].uploadedAt).toLocaleDateString() : 'Never';
+                    // Calculate storage usage - sum all files (just like backup history)
+                    const storageUsed = calculateStorageUsage(allData);
+                    console.log('💾 Total storage:', formatFileSize(storageUsed));
+
+                    // Filter ONLY UPLOADS for analytics (not downloads)
+                    const uploads = allData.filter(backup => backup.type === 'backup' || backup.type === 'upload');
+                    console.log('📤 Uploads only:', uploads.length, 'files');
+                    console.log('📊 Upload details:', uploads.map(u => ({
+                        fileName: u.fileName,
+                        fileSize: u.fileSize,
+                        type: u.type
+                    })));
+
+                    // Calculate analytics from UPLOADS only
+                    const totalBackups = uploads.length;
+                    const totalSize = uploads.reduce((sum, backup) => {
+                        console.log('➕ Adding upload size:', backup.fileSize, 'from', backup.fileName);
+                        return sum + (backup.fileSize || 0);
+                    }, 0);
+
+                    const lastBackup = uploads.length > 0 ?
+                        new Date(uploads[0].uploadedAt).toLocaleDateString() : 'Never';
+
+                    console.log('📊 Uploads total size:', totalSize, 'bytes');
+                    console.log('📊 Uploads size in MB:', (totalSize / (1024 * 1024)).toFixed(2), 'MB');
 
                     // Update basic metrics
                     document.getElementById('total-backups').textContent = totalBackups;
-                    document.getElementById('total-size').textContent = formatFileSize(totalSize);
+
+                    const totalSizeElement = document.getElementById('analytics-total-size');
+                    const formattedSize = formatFileSize(storageUsed);
+                    console.log('🔍 Setting analytics-total-size element to:', formattedSize);
+                    console.log('🔍 Element found:', totalSizeElement);
+                    totalSizeElement.textContent = formattedSize;
+
                     document.getElementById('last-backup').textContent = lastBackup;
 
                     // Sliding Window Algorithm for Recent Activity (Last 7 days)
-                    updateRecentActivity(backups);
+                    updateRecentActivity(allData);
 
                     // File Type Distribution
-                    updateFileTypeDistribution(backups);
+                    updateFileTypeDistribution(allData);
 
                     // Emotional Analysis
-                    updateEmotionalAnalysis(backups);
+                    updateEmotionalAnalysis(allData);
 
                     console.log('📊 Analytics updated with real data:', {
                         totalBackups,
@@ -806,16 +807,25 @@
         // Storage calculation functions - Fetch from MongoDB
         async function calculateStorageUsage() {
             try {
-                const response = await fetch(`http://localhost:3000/api/backup?userId=${user.uid}`);
+                console.log('🔍 Calculating storage usage...');
+                const response = await fetch(`${API_BASE}/backup?userId=${user.uid}`);
                 const data = await response.json();
+                console.log('📊 Storage data:', data);
 
                 if (Array.isArray(data)) {
+                    // Filter ONLY UPLOADS for storage calculation
+                    const uploads = data.filter(backup => backup.type === 'backup' || backup.type === 'upload');
+                    console.log('📤 Storage: Processing', uploads.length, 'uploads only');
+
                     let totalSize = 0;
-                    data.forEach(backup => {
+                    uploads.forEach(backup => {
+                        console.log('📁 Upload file size:', backup.fileSize, 'bytes from', backup.fileName);
                         if (backup.fileSize) {
                             totalSize += backup.fileSize;
                         }
                     });
+                    console.log('💾 Uploads total size:', totalSize, 'bytes');
+                    console.log('💾 Uploads size in MB:', (totalSize / (1024 * 1024)).toFixed(2), 'MB');
                     return totalSize;
                 }
                 return 0;
@@ -825,40 +835,6 @@
             }
         }
 
-        async function updateStorageDisplay() {
-            try {
-                const totalSize = await calculateStorageUsage();
-                const sizeInMB = (totalSize / (1024 * 1024)).toFixed(2);
-                const sizeInGB = (totalSize / (1024 * 1024 * 1024)).toFixed(2);
-
-                // Free plan: 5GB limit
-                const limitInBytes = 5 * 1024 * 1024 * 1024; // 5GB
-                const percentage = Math.min((totalSize / limitInBytes) * 100, 100);
-
-                // Update storage display
-                document.getElementById('storage-used').textContent =
-                    totalSize > 1024 * 1024 * 1024 ? `${sizeInGB} GB` : `${sizeInMB} MB`;
-                document.getElementById('storage-progress').style.width = `${percentage}%`;
-                document.getElementById('storage-percentage').textContent = `${percentage.toFixed(1)}%`;
-
-                // Change color based on usage
-                const progressBar = document.getElementById('storage-progress');
-                if (percentage > 80) {
-                    progressBar.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-                } else if (percentage > 60) {
-                    progressBar.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
-                } else {
-                    progressBar.style.background = 'linear-gradient(135deg, #8b5cf6, #7c3aed)';
-                }
-
-                console.log('📊 Storage updated:', {
-                    totalSize: totalSize > 1024 * 1024 * 1024 ? `${sizeInGB} GB` : `${sizeInMB} MB`,
-                    percentage: `${percentage.toFixed(1)}%`
-                });
-            } catch (error) {
-                console.error('❌ Error updating storage display:', error);
-            }
-        }
 
 
         // Show file previews
@@ -908,6 +884,7 @@
                 if (targetTab === 'restore') {
                     loadRestoreGallery();
                 }
+
             });
         });
 
@@ -950,7 +927,7 @@
                 const user = auth.currentUser;
                 if (!user) return;
 
-                const response = await fetch(`http://localhost:3000/api/backup?userId=${user.uid}`);
+                const response = await fetch(`${API_BASE}/backup?userId=${user.uid}`);
                 const allBackups = await response.json();
                 const backups = allBackups.filter(backup => backup.userId === user.uid);
 
@@ -963,15 +940,23 @@
                 }
 
                 backups.forEach((backup, index) => {
-                    const galleryItem = document.createElement('div');
-                    galleryItem.className = 'gallery-item';
-                    galleryItem.innerHTML = `
+                            const galleryItem = document.createElement('div');
+                            galleryItem.className = 'gallery-item';
+                            galleryItem.innerHTML = `
                         <div class="gallery-checkbox">
                             <input type="checkbox" id="file-${index}" data-file-id="${backup._id}" data-file-url="${backup.fileUrl}">
                             <label for="file-${index}"></label>
                         </div>
-                        <div class="gallery-preview" onclick="previewImage('${backup.fileUrl}', '${backup.fileName}')">
-                            <img src="${backup.fileUrl}" alt="${backup.fileName}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+SW1hZ2U8L3RleHQ+PC9zdmc+'">
+                        <div class="gallery-preview" onclick="previewMedia('${backup.fileUrl}', '${backup.fileName}', '${backup.mimeType}')">
+                            ${backup.mimeType.startsWith('video/') ? 
+                                `<video src="${backup.fileUrl}" alt="${backup.fileName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                    <div class="video-placeholder">
+                                        <i class="fas fa-play-circle"></i>
+                                        <p>Video Preview</p>
+                                    </div>
+                                </video>` : 
+                                `<img src="${backup.fileUrl}" alt="${backup.fileName}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+SW1hZ2U8L3RleHQ+PC9zdmc+'">`
+                            }
                         </div>
                         <div class="gallery-info">
                             <h4>${backup.fileName}</h4>
@@ -1028,13 +1013,19 @@
         document.getElementById('download-all-zip-btn').addEventListener('click', downloadAllAsZip);
 
         // Preview image in modal
-        function previewImage(imageUrl, fileName) {
+        function previewMedia(mediaUrl, fileName, mimeType) {
             const modal = document.createElement('div');
-            modal.className = 'image-modal';
+            modal.className = 'media-modal';
             modal.innerHTML = `
                 <div class="modal-content">
                     <span class="close">&times;</span>
-                    <img src="${imageUrl}" alt="${fileName}">
+                    ${mimeType.startsWith('video/') ? 
+                        `<video controls autoplay>
+                            <source src="${mediaUrl}" type="${mimeType}">
+                            Your browser does not support the video tag.
+                        </video>` : 
+                        `<img src="${mediaUrl}" alt="${fileName}">`
+                    }
                     <h3>${fileName}</h3>
                 </div>
             `;
@@ -1051,32 +1042,91 @@
             });
         }
 
+        // Keep old function for backward compatibility
+        function previewImage(imageUrl, fileName) {
+            previewMedia(imageUrl, fileName, 'image/jpeg');
+        }
+
+        // Simple storage calculation - just like backup history
+        function calculateStorageUsage(backups) {
+            if (!Array.isArray(backups)) return 0;
+            
+            const totalSize = backups.reduce((total, backup) => {
+                return total + (backup.fileSize || 0);
+            }, 0);
+            
+            return totalSize;
+        }
+
+        async function updateStorageDisplay() {
+            try {
+                const totalSize = await calculateStorageUsage();
+                const sizeInMB = (totalSize / (1024 * 1024)).toFixed(2);
+                const sizeInGB = (totalSize / (1024 * 1024 * 1024)).toFixed(2);
+
+                // Free plan: 5GB limit
+                const limitInBytes = 5 * 1024 * 1024 * 1024; // 5GB
+                const percentage = Math.min((totalSize / limitInBytes) * 100, 100);
+
+                // Update storage display
+                document.getElementById('storage-used').textContent =
+                    totalSize > 1024 * 1024 * 1024 ? `${sizeInGB} GB` : `${sizeInMB} MB`;
+                document.getElementById('storage-progress').style.width = `${percentage}%`;
+                document.getElementById('storage-percentage').textContent = `${percentage.toFixed(1)}%`;
+
+                // Change color based on usage
+                const progressBar = document.getElementById('storage-progress');
+                if (percentage > 80) {
+                    progressBar.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                } else if (percentage > 60) {
+                    progressBar.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+                } else {
+                    progressBar.style.background = 'linear-gradient(135deg, #8b5cf6, #7c3aed)';
+                }
+
+                console.log('📊 Storage updated:', {
+                    totalSize: totalSize > 1024 * 1024 * 1024 ? `${sizeInGB} GB` : `${sizeInMB} MB`,
+                    percentage: `${percentage.toFixed(1)}%`
+                });
+            } catch (error) {
+                console.error('❌ Error updating storage display:', error);
+            }
+        }
+
         // Add download to backup history
-        function addToBackupHistory(fileName, fileUrl) {
-            const backupList = document.getElementById('backup-list');
+        async function addToBackupHistory(fileName, fileUrl) {
+            try {
+                console.log('💾 Adding to backup history:', fileName);
 
-            // Create backup history entry
-            const backupItem = document.createElement('div');
-            backupItem.className = 'backup-item';
-            backupItem.innerHTML = `
-                <div class="backup-info">
-                    <h3>📥 ${fileName}</h3>
-                    <p>Downloaded • ${new Date().toLocaleDateString()}</p>
-                    <p><strong>Status:</strong> Restored from backup</p>
-                </div>
-                <div class="backup-actions">
-                    <span class="backup-status restored">✅ Restored</span>
-                </div>
-            `;
+                // Update UI
+                const backupList = document.getElementById('backup-list');
+                const backupItem = document.createElement('div');
+                backupItem.className = 'backup-item';
+                backupItem.innerHTML = `
+                    <div class="backup-info">
+                        <h3>📥 ${fileName}</h3>
+                        <p>Downloaded • ${new Date().toLocaleDateString()}</p>
+                        <p><strong>Status:</strong> Restored from backup</p>
+                    </div>
+                    <div class="backup-actions">
+                        <span class="backup-status restored">✅ Restored</span>
+                    </div>
+                `;
 
-            // Add to top of list
-            backupList.insertBefore(backupItem, backupList.firstChild);
+                // Add to top of list
+                backupList.insertBefore(backupItem, backupList.firstChild);
 
-            // Update analytics
-            updateAnalytics();
-            updateStorageDisplay();
+                // Update analytics with real data
+                setTimeout(() => {
+                    updateAnalytics();
+                    console.log('📊 Analytics updated after download');
+                }, 1000);
 
-            console.log('📥 Added to backup history:', fileName);
+                console.log('📥 Added to backup history:', fileName);
+            } catch (error) {
+                console.error('❌ Error saving download:', error);
+                showMessage('Error tracking download', 'error');
+            }
         }
 
         // Download single file
@@ -1121,7 +1171,7 @@
                 const user = auth.currentUser;
                 if (!user) return;
 
-                const response = await fetch(`http://localhost:3000/api/backup?userId=${user.uid}`);
+                const response = await fetch(`${API_BASE}/backup?userId=${user.uid}`);
                 const allBackups = await response.json();
                 const backups = allBackups.filter(backup => backup.userId === user.uid);
 
@@ -1277,7 +1327,6 @@
                 selectedFiles = [];
                 loadBackupHistory();
                 updateAnalytics();
-                updateStorageDisplay();
             }, 2000);
         }
     </script>
