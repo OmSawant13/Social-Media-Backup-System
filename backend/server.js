@@ -86,7 +86,7 @@ async function createIndexes() {
 // Upload file to GridFS and save metadata
 app.post('/api/backup', upload.single('file'), async(req, res) => {
     try {
-        const { userId, caption, mood, type } = req.body;
+        const { userId, username, email, caption, mood, type } = req.body;
         const file = req.file;
 
 
@@ -114,6 +114,8 @@ app.post('/api/backup', upload.single('file'), async(req, res) => {
             const result = await collection.insertOne({
                 type: 'backup',
                 userId: userId,
+                username: username || 'Anonymous',
+                email: email || '',
                 fileName: file.originalname,
                 fileSize: file.size,
                 mimeType: file.mimetype,

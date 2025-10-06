@@ -442,6 +442,8 @@
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('userId', user.uid);
+                formData.append('username', user.displayName || user.email || 'Anonymous');
+                formData.append('email', user.email || '');
                 formData.append('caption', caption);
                 formData.append('mood', selectedMood || 'neutral');
 
