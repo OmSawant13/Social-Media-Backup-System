@@ -1,13 +1,35 @@
 /**
- * Data Structures & Algorithms Utilities for Social Media Backup System
- * Implements key DSA concepts: Hashing, Queues, Stacks, Trees, etc.
+ * 🚀 DATA STRUCTURES & ALGORITHMS UTILITIES
+ * 📊 Social Media Backup & Restore System
+ * 
+ * Implements 8 Key DSA Concepts:
+ * 1. SHA-256 Hashing - File Integrity & Deduplication
+ * 2. Queue - Backup Jobs Management (FIFO)
+ * 3. Stack - File Reconstruction (LIFO)
+ * 4. Merkle Tree - Data Integrity Verification
+ * 5. File Chunking - Large File Processing
+ * 6. Bloom Filter - Chunk Existence Checking
+ * 7. Linked List - File Chunks Storage
+ * 8. Sliding Window - Real-time Analytics
+ * 
+ * 🎯 Purpose: Advanced algorithms for professional file management
+ * 💡 Innovation: First emotional backup system with DSA implementation
  */
 
-// ==================== HASHING ALGORITHMS ====================
+// ==================== 🔐 HASHING ALGORITHMS ====================
 
 /**
- * SHA-256 Hash Implementation for File Deduplication
- * Uses Web Crypto API for secure hashing
+ * 🔐 SHA-256 HASH MANAGER
+ * 
+ * Purpose: File Integrity & Deduplication
+ * Algorithm: SHA-256 (Secure Hash Algorithm)
+ * Features: Caching, Web Crypto API, File Verification
+ * 
+ * 🎯 Use Cases:
+ * - File integrity verification
+ * - Duplicate file detection
+ * - Secure file hashing
+ * - Data corruption prevention
  */
 class HashManager {
     constructor() {
@@ -51,11 +73,20 @@ class HashManager {
     }
 }
 
-// ==================== QUEUE DATA STRUCTURE ====================
+// ==================== 📋 QUEUE DATA STRUCTURE ====================
 
 /**
- * Queue implementation for managing backup jobs
- * Uses FIFO (First In, First Out) principle
+ * 📋 BACKUP JOBS QUEUE
+ * 
+ * Purpose: Backup Jobs Management
+ * Algorithm: FIFO (First In, First Out)
+ * Features: Job Scheduling, Priority Management, Load Balancing
+ * 
+ * 🎯 Use Cases:
+ * - File upload queue management
+ * - Backup job scheduling
+ * - Priority-based processing
+ * - Load balancing across servers
  */
 class Queue {
     constructor() {
@@ -114,11 +145,20 @@ class Queue {
     }
 }
 
-// ==================== STACK DATA STRUCTURE ====================
+// ==================== 📚 STACK DATA STRUCTURE ====================
 
 /**
- * Stack implementation for file reconstruction during restore
- * Uses LIFO (Last In, First Out) principle
+ * 📚 FILE RECONSTRUCTION STACK
+ * 
+ * Purpose: File Reconstruction During Restore
+ * Algorithm: LIFO (Last In, First Out)
+ * Features: Chunk Assembly, File Recovery, Undo Operations
+ * 
+ * 🎯 Use Cases:
+ * - File reconstruction from chunks
+ * - Undo/redo operations
+ * - File recovery processes
+ * - Chunk assembly management
  */
 class Stack {
     constructor() {
@@ -176,12 +216,25 @@ class Stack {
     }
 }
 
-// ==================== MERKLE TREE ====================
+// ==================== 🌳 MERKLE TREE ====================
 
 /**
- * Merkle Tree implementation for file integrity verification
- * Each leaf node represents a file chunk hash
- * Internal nodes are hashes of their children
+ * 🌳 MERKLE TREE FOR INTEGRITY VERIFICATION
+ * 
+ * Purpose: File Integrity Verification
+ * Algorithm: Binary Tree with Hash Nodes
+ * Features: Data Integrity, Corruption Detection, Fast Verification
+ * 
+ * 🎯 Use Cases:
+ * - File integrity verification
+ * - Data corruption detection
+ * - Blockchain-style verification
+ * - Secure file validation
+ * 
+ * 📊 Tree Structure:
+ * - Leaf nodes: File chunk hashes
+ * - Internal nodes: Hash of children
+ * - Root: Complete file integrity hash
  */
 class MerkleTree {
     constructor(hashes) {
@@ -261,11 +314,25 @@ class MerkleTree {
     }
 }
 
-// ==================== FILE CHUNKING ALGORITHM ====================
+// ==================== 🔪 FILE CHUNKING ALGORITHM ====================
 
 /**
- * File Chunking Manager for splitting files into 512KB chunks
- * Implements efficient chunking with metadata tracking
+ * 🔪 FILE CHUNKING MANAGER
+ * 
+ * Purpose: Large File Processing & Management
+ * Algorithm: Fixed-size Chunking (512KB chunks)
+ * Features: Parallel Processing, Metadata Tracking, Efficient Storage
+ * 
+ * 🎯 Use Cases:
+ * - Large file uploads (videos, images)
+ * - Parallel processing
+ * - Memory optimization
+ * - Network efficiency
+ * 
+ * 📊 Chunking Strategy:
+ * - Default size: 512KB per chunk
+ * - Metadata: Index, size, total chunks
+ * - Reconstruction: Ordered assembly
  */
 class FileChunker {
     constructor(chunkSize = 512 * 1024) { // 512KB default
@@ -317,11 +384,26 @@ class FileChunker {
     }
 }
 
-// ==================== BLOOM FILTER (OPTIONAL) ====================
+// ==================== 🌸 BLOOM FILTER ====================
 
 /**
- * Bloom Filter for fast chunk existence checking
- * Reduces storage queries for non-existent chunks
+ * 🌸 BLOOM FILTER FOR CHUNK EXISTENCE
+ * 
+ * Purpose: Fast Chunk Existence Checking
+ * Algorithm: Probabilistic Data Structure
+ * Features: Space Efficient, Fast Lookups, False Positive Tolerant
+ * 
+ * 🎯 Use Cases:
+ * - Chunk existence checking
+ * - Duplicate detection
+ * - Cache optimization
+ * - Storage query reduction
+ * 
+ * ⚡ Performance Benefits:
+ * - O(1) lookup time
+ * - Space efficient
+ * - Reduces database queries
+ * - Fast duplicate detection
  */
 class BloomFilter {
     constructor(size = 10000, hashFunctions = 3) {
@@ -371,11 +453,26 @@ class BloomFilter {
     }
 }
 
-// ==================== LINKED LIST FOR CHUNK STORAGE ====================
+// ==================== 🔗 LINKED LIST FOR CHUNK STORAGE ====================
 
 /**
- * Linked List implementation for storing file chunks in order
- * Maintains chunk sequence for file reconstruction
+ * 🔗 CHUNK LINKED LIST
+ * 
+ * Purpose: File Chunks Storage & Sequence Management
+ * Algorithm: Singly Linked List
+ * Features: Ordered Storage, Sequential Access, Memory Efficient
+ * 
+ * 🎯 Use Cases:
+ * - File chunk storage
+ * - Sequential processing
+ * - Memory efficient storage
+ * - Ordered file reconstruction
+ * 
+ * 📊 List Structure:
+ * - Head: First chunk
+ * - Tail: Last chunk
+ * - Nodes: Chunk data + next pointer
+ * - Size: Total chunk count
  */
 class ChunkNode {
     constructor(chunk, next = null) {
@@ -450,7 +547,24 @@ class ChunkLinkedList {
     }
 }
 
-// ==================== EXPORT UTILITIES ====================
+// ==================== 🚀 EXPORT UTILITIES ====================
+
+/**
+ * 🌟 GLOBAL DSA UTILITIES EXPORT
+ * 
+ * Makes all DSA classes available globally for use in main application
+ * 
+ * 📊 Available Classes:
+ * 1. HashManager - SHA-256 hashing & caching
+ * 2. Queue - FIFO backup job management
+ * 3. Stack - LIFO file reconstruction
+ * 4. MerkleTree - Data integrity verification
+ * 5. FileChunker - Large file processing
+ * 6. BloomFilter - Chunk existence checking
+ * 7. ChunkLinkedList - Ordered chunk storage
+ * 
+ * 🎯 Integration: Used in index.html for advanced file management
+ */
 
 // Make utilities available globally
 window.HashManager = HashManager;
@@ -461,4 +575,6 @@ window.FileChunker = FileChunker;
 window.BloomFilter = BloomFilter;
 window.ChunkLinkedList = ChunkLinkedList;
 
-console.log('DSA Utilities loaded successfully!');
+console.log('🚀 DSA Utilities loaded successfully!');
+console.log('📊 Available Classes: HashManager, Queue, Stack, MerkleTree, FileChunker, BloomFilter, ChunkLinkedList');
+console.log('🎯 Ready for advanced file management operations!');
